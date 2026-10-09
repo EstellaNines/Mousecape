@@ -13,42 +13,38 @@ NSString *backupStringForIdentifier(NSString *identifier) {
     return [NSString stringWithFormat:@"com.alexzielenski.mousecape.%@", identifier];
 }
 
-void backupCursorForIdentifier(NSString *ident) {
+BOOL backupCursorForIdentifier(NSString *ident) {
     bool registered = false;
     MCIsCursorRegistered(CGSMainConnectionID(), (char *)ident.UTF8String, &registered);
     
 //     dont try to backup a nonexistant cursor
     if (!registered)
-        return;
+        return YES;
     
     NSString *backupIdent = backupStringForIdentifier(ident);
     MCIsCursorRegistered(CGSMainConnectionID(), (char *)backupIdent.UTF8String, &registered);
     
 //     don't re-back it up
     if (registered)
-        return;
+        return YES;
     
     NSDictionary *cape = capeWithIdentifier(ident);
-    (void)applyCapeForIdentifier(cape, backupIdent, YES);
-    
+    return applyCapeForIdentifier(cape, backupIdent, YES);
 }
 
-void backupAllCursors() {
-    bool arrowRegistered = false;
-    MCIsCursorRegistered(CGSMainConnectionID(), (char *)backupStringForIdentifier(@"com.apple.coregraphics.Arrow").UTF8String, &arrowRegistered);
-    
-    if (arrowRegistered) {
-        MMLog("Skipping backup, backup already exists");
-//         we are already backed up
-        return;
-    }
+BOOL backupAllCursors() {
     // Backup main cursors first
     NSUInteger i = 0;
     NSString *key = nil;
     while ((key = defaultCursors[i]) != nil) {
-        backupCursorForIdentifier(key);
+        for (NSString *name in MCCursorNamesForIdentifier(key)) {
+            if (!backupCursorForIdentifier(name)) {
+                MMLog(BOLD RED "Could not back up %s; aborting application." RESET, name.UTF8String);
+                return NO;
+            }
+        }
         i++;
     }
     // no need to backup core cursors
-    
+    return YES;
 }

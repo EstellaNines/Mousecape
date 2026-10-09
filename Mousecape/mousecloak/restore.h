@@ -10,7 +10,7 @@
 #define Mousecape_restore_h
 
 extern NSString *restoreStringForIdentifier(NSString *identifier);
-extern void restoreCursorForIdentifier(NSString *ident);
-extern void resetAllCursors(void);
+extern BOOL restoreCursorForIdentifier(NSString *ident);
+extern BOOL resetAllCursors(void);
 
 #endif

@@ -102,11 +102,11 @@ NSData *pngDataForImage(id image) {
 
 NSDictionary *capeWithIdentifier(NSString *identifier) {
     
-    NSUInteger frameCount;
-    CGFloat frameDuration;
-    CGPoint hotSpot;
-    CGSize size;
-    CFArrayRef representations;
+    NSUInteger frameCount = 0;
+    CGFloat frameDuration = 0;
+    CGPoint hotSpot = CGPointZero;
+    CGSize size = CGSizeZero;
+    CFArrayRef representations = NULL;
     bool registered = false;
     
     MCIsCursorRegistered(CGSMainConnectionID(), (char *)identifier.UTF8String, &registered);
@@ -120,8 +120,10 @@ NSDictionary *capeWithIdentifier(NSString *identifier) {
         error = CoreCursorCopyImages(CGSMainConnectionID(), [[identifier pathExtension] intValue], &representations, &size, &hotSpot, &frameCount, &frameDuration);
     }
     
-    if (error || !representations || !CFArrayGetCount(representations))
+    if (error || !representations || !CFArrayGetCount(representations)) {
+        if (representations) CFRelease(representations);
         return nil;
+    }
     
     NSDictionary *dict = @{MCCursorDictionaryFrameCountKey: @(frameCount), MCCursorDictionaryFrameDuratiomKey: @(frameDuration), MCCursorDictionaryHotSpotXKey: @(hotSpot.x), MCCursorDictionaryHotSpotYKey: @(hotSpot.y), MCCursorDictionaryPointsWideKey: @(size.width), MCCursorDictionaryPointsHighKey: @(size.height), MCCursorDictionaryRepresentationsKey: (__bridge NSArray *)representations};
     
@@ -225,4 +227,21 @@ BOOL MCCursorIsPointer(NSString *identifier) {
     });
 
     return [pointers containsObject:identifier];
+}
+
+NSArray<NSString *> *MCCursorNamesForIdentifier(NSString *identifier) {
+    if (![identifier isEqualToString:@"com.apple.coregraphics.Arrow"] &&
+        ![identifier isEqualToString:@"com.apple.coregraphics.IBeam"]) {
+        return @[identifier];
+    }
+
+    NSString *variant = [identifier stringByAppendingString:@"S"];
+    // shortcut: scans IDs 0...127 as in the Tahoe fork; revisit if Apple adds IDs beyond this range.
+    for (int cursorID = 0; cursorID < 128; cursorID++) {
+        char *name = CGSCursorNameForSystemCursor(cursorID);
+        if (name && [variant isEqualToString:[NSString stringWithUTF8String:name]]) {
+            return @[identifier, variant];
+        }
+    }
+    return @[identifier];
 }

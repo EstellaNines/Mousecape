@@ -10,7 +10,7 @@
 #define Mousecape_backup_h
 
 extern NSString *backupStringForIdentifier(NSString *identifier);
-extern void backupCursorForIdentifier(NSString *ident);
-extern void backupAllCursors(void);
+extern BOOL backupCursorForIdentifier(NSString *ident);
+extern BOOL backupAllCursors(void);
 
 #endif

@@ -12,9 +12,12 @@
 #import "MCPrefs.h"
 #import "NSBitmapImageRep+ColorSpace.h"
 
-BOOL applyCursorForIdentifier(NSUInteger frameCount, CGFloat frameDuration, CGPoint hotSpot, CGSize size, NSArray *images, NSString *ident, NSUInteger repeatCount) {
-    if (frameCount > 24 || frameCount < 1) {
-        MMLog(BOLD RED "Frame count of %s out of range [1...24]", ident.UTF8String);
+static BOOL registerCursor(NSUInteger frameCount, CGFloat frameDuration, CGPoint hotSpot, CGSize size, NSArray *images, NSString *ident) {
+    if (frameCount > 24 || frameCount < 1 || !images.count || !ident.length ||
+        !isfinite(frameDuration) || frameDuration < 0 || (frameCount > 1 && frameDuration == 0) ||
+        !isfinite(size.width) || !isfinite(size.height) || size.width <= 0 || size.height <= 0 ||
+        !isfinite(hotSpot.x) || !isfinite(hotSpot.y)) {
+        MMLog(BOLD RED "Invalid cursor metadata for %s" RESET, ident.UTF8String);
         return NO;
     }
 
@@ -31,14 +34,32 @@ BOOL applyCursorForIdentifier(NSUInteger frameCount, CGFloat frameDuration, CGPo
                                               (__bridge CFArrayRef)images,
                                               &seed);
     
+    if (err != kCGErrorSuccess) {
+        MMLog(BOLD RED "Failed to register %s (CGError %d)" RESET, ident.UTF8String, err);
+    }
     return (err == kCGErrorSuccess);
 }
 
+BOOL applyCursorForIdentifier(NSUInteger frameCount, CGFloat frameDuration, CGPoint hotSpot, CGSize size, NSArray *images, NSString *ident, NSUInteger repeatCount) {
+    if (![ident isKindOfClass:[NSString class]] || !ident.length) return NO;
+    for (NSString *name in MCCursorNamesForIdentifier(ident)) {
+        if (!registerCursor(frameCount, frameDuration, hotSpot, size, images, name)) return NO;
+    }
+    return YES;
+}
+
 BOOL applyCapeForIdentifier(NSDictionary *cursor, NSString *identifier, BOOL restore) {
-    if (!cursor || !identifier) {
-        NSLog(@"bad seed");
+    if (![cursor isKindOfClass:[NSDictionary class]] ||
+        ![identifier isKindOfClass:[NSString class]] || !identifier.length) {
         return NO;
     }
+
+    for (NSString *key in @[@"FrameCount", @"FrameDuration", @"HotSpotX", @"HotSpotY", @"PointsWide", @"PointsHigh"]) {
+        if (![cursor[key] isKindOfClass:[NSNumber class]]) return NO;
+    }
+    double frames = [cursor[MCCursorDictionaryFrameCountKey] doubleValue];
+    if (!isfinite(frames) || frames < 1 || frames > 24 || frames != floor(frames)) return NO;
+    if (![cursor[MCCursorDictionaryRepresentationsKey] isKindOfClass:[NSArray class]]) return NO;
 
     BOOL lefty = MCFlag(MCPreferencesHandednessKey);
     BOOL pointer = MCCursorIsPointer(identifier);
@@ -63,10 +84,13 @@ BOOL applyCapeForIdentifier(NSDictionary *cursor, NSString *identifier, BOOL res
         NSBitmapImageRep *rep;
         if (type == CGImageGetTypeID()) {
             rep = [[[NSBitmapImageRep alloc] initWithCGImage:(__bridge CGImageRef)object] autorelease];
-        } else {
+        } else if ([object isKindOfClass:[NSData class]]) {
             rep = [[[NSBitmapImageRep alloc] initWithData:object] autorelease];
+        } else {
+            return NO;
         }
         rep = rep.retaggedSRGBSpace;
+        if (!rep.CGImage) return NO;
 
         if (!lefty || restore || !pointer) {
             // special case if array has a type of CGImage already there is no need to convert it
@@ -107,17 +131,23 @@ BOOL applyCapeForIdentifier(NSDictionary *cursor, NSString *identifier, BOOL res
         }
     }
     
+    // Backups and restores must preserve each original name independently.
+    if (restore) return registerCursor(frameCount.unsignedIntegerValue, frameDuration.doubleValue, hotSpot, size, images, identifier);
     return applyCursorForIdentifier(frameCount.unsignedIntegerValue, frameDuration.doubleValue, hotSpot, size, images, identifier, 0);
 }
 
 BOOL applyCape(NSDictionary *dictionary) {
     @autoreleasepool {
+        if (![dictionary isKindOfClass:[NSDictionary class]] ||
+            ![dictionary[MCCursorDictionaryCursorsKey] isKindOfClass:[NSDictionary class]] ||
+            ![dictionary[MCCursorDictionaryIdentifierKey] isKindOfClass:[NSString class]]) return NO;
         NSDictionary *cursors = dictionary[MCCursorDictionaryCursorsKey];
+        if (!cursors.count) return NO;
         NSString *name = dictionary[MCCursorDictionaryCapeNameKey];
         NSNumber *version = dictionary[MCCursorDictionaryCapeVersionKey];
         
-        resetAllCursors();
-        backupAllCursors();
+        if (!resetAllCursors()) return NO;
+        if (!backupAllCursors()) return NO;
         
         MMLog("Applying cape: %s %.02f", name.UTF8String, version.floatValue);
         
@@ -128,6 +158,7 @@ BOOL applyCape(NSDictionary *dictionary) {
             BOOL success = applyCapeForIdentifier(cape, key, NO);
             if (!success) {
                 MMLog(BOLD RED "Failed to hook identifier %s for some unknown reason. Bailing out..." RESET, key.UTF8String);
+                resetAllCursors();
                 return NO;
             }
         }

@@ -101,11 +101,11 @@ int main(int argc, char * argv[]) {
         
         if ([settings boolForKey:@"reset"]) {
             // reset to default cursors
-            resetAllCursors();
+            BOOL restored = resetAllCursors();
             
             if (!suppressCopyright)
                 [options replacePlaceholdersAndPrintStringFromBlock:options.printHelpFooter];
-            return EXIT_SUCCESS;
+            return restored ? EXIT_SUCCESS : EXIT_FAILURE;
         }
         
         BOOL convert = [settings isKeyPresentAtThisLevel:@"convert"];
@@ -135,7 +135,7 @@ int main(int argc, char * argv[]) {
         
         if (apply) {
             // Apply a cape at a given path
-            applyCapeAtPath([settings objectForKey:@"apply"]);
+            if (!applyCapeAtPath([settings objectForKey:@"apply"])) return EXIT_FAILURE;
             goto fin;
         } else if (create || convert) {
             NSError *error  = nil;
@@ -187,4 +187,3 @@ int main(int argc, char * argv[]) {
         return EXIT_SUCCESS;
     }
 }
-

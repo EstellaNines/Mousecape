@@ -139,12 +139,13 @@
 - (void)applyCape:(MCCursorLibrary *)cape {
     if (applyCapeAtPath(cape.fileURL.path)) {
         self.appliedCape = cape;
+    } else if (!MCDefault(MCPreferencesAppliedCursorKey)) {
+        self.appliedCape = nil;
     }
 }
 
 - (void)restoreCape {
-    resetAllCursors();
-    self.appliedCape = nil;
+    if (resetAllCursors()) self.appliedCape = nil;
 }
 
 - (NSSet *)capesWithIdentifier:(NSString *)identifier {

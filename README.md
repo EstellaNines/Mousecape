@@ -3,6 +3,8 @@ Mousecape
 
 A free cursor manager for Mac OS 10.8+ built using private, nonintrusive CoreGraphics APIs.
 
+This is [EstellaNines' compatibility fork](https://github.com/EstellaNines/Mousecape) of Alex Zielenski's Mousecape. Development version **1821** adds the ArrowS and IBeamS cursor names used on macOS Tahoe, while retaining upstream's 2024 cursor registration ABI correction. See [compatibility, build instructions, and validation](docs/compatibility.md) for the tested platform and remaining limits.
+
 ![](https://github.com/alexzielenski/Mousecape/raw/master/screenshot.png)
 
 ## How it works
@@ -31,7 +33,7 @@ Tell your friends.
 
 ## Where can I get a copy of this sweet tool?
 
-In the [releases section](https://github.com/alexzielenski/Mousecape/releases) of this GitHub page. There are stable reases there. **The current version is 1813**.
+The [upstream releases](https://github.com/alexzielenski/Mousecape/releases) provide stable version **1813**. This fork's development version **1821** is built from source using the [build instructions](docs/compatibility.md). Upstream automatic updates are disabled in this fork.
 
 ## There's now the beginning of a wiki
 
@@ -51,4 +53,3 @@ Redistribution and use in source and binary forms, with or without modification,
 * Any redistribution, use, or modification is done solely for personal benefit and not for any commercial purpose or for monetary gain
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-

@@ -72,4 +72,6 @@ extern NSString *MMGet(NSString *prompt);
 
 extern CGError MCIsCursorRegistered(CGSConnectionID cid, char *cursorName, bool *registered);
 extern BOOL MCCursorIsPointer(NSString *identifier);
+// Includes Tahoe's system variant only when the running OS exposes it.
+extern NSArray<NSString *> *MCCursorNamesForIdentifier(NSString *identifier);
 #endif
