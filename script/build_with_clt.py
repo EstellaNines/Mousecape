@@ -81,7 +81,9 @@ else:
     compile_target(helper_name, helper / "Contents/MacOS" / helper_name, "x86_64")
     info = plistlib.loads((project / "Mousecape/Mousecape-Info.plist").read_bytes())
     info.update(CFBundleExecutable="Mousecape", CFBundleIdentifier="com.alexzielenski.Mousecape",
-                CFBundleName="Mousecape", LSMinimumSystemVersion="10.13")
+                CFBundleName="Mousecape", LSMinimumSystemVersion="10.13",
+                CFBundleIconFile=source_info["CFBundleIconFile"], CFBundleIconName=source_info["CFBundleIconName"])
+    assert (app / "Contents/Resources" / pathlib.Path(info["CFBundleIconFile"]).with_suffix(".icns")).is_file()
     (app / "Contents/Info.plist").write_bytes(plistlib.dumps(info))
     helper_info = plistlib.loads((project / "mousecloakHelper/Info.plist").read_bytes())
     helper_info.update(CFBundleExecutable=helper_name, CFBundleIdentifier=helper_name,

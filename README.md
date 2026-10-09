@@ -3,7 +3,7 @@ Mousecape
 
 A free cursor manager for Mac OS 10.8+ built using private, nonintrusive CoreGraphics APIs.
 
-This is [EstellaNines' compatibility fork](https://github.com/EstellaNines/Mousecape) of Alex Zielenski's Mousecape. Development version **1821** adds the ArrowS and IBeamS cursor names used on macOS Tahoe, while retaining upstream's 2024 cursor registration ABI correction. See [compatibility, build instructions, and validation](docs/compatibility.md) for the tested platform and remaining limits.
+This is [EstellaNines' compatibility fork](https://github.com/EstellaNines/Mousecape) of Alex Zielenski's Mousecape. Development version **1822** adds the ArrowS and IBeamS cursor names used on macOS Tahoe, while retaining upstream's 2024 cursor registration ABI correction. See [compatibility, build instructions, and validation](docs/compatibility.md) for the tested platform and remaining limits.
 
 ![](https://github.com/alexzielenski/Mousecape/raw/master/screenshot.png)
 
@@ -33,7 +33,7 @@ Tell your friends.
 
 ## Where can I get a copy of this sweet tool?
 
-The [upstream releases](https://github.com/alexzielenski/Mousecape/releases) provide stable version **1813**. This fork's development version **1821** is built from source using the [build instructions](docs/compatibility.md). Upstream automatic updates are disabled in this fork.
+The [upstream releases](https://github.com/alexzielenski/Mousecape/releases) provide stable version **1813**. This fork's development version **1822** is built from source using the [build instructions](docs/compatibility.md). Upstream automatic updates are disabled in this fork.
 
 ## There's now the beginning of a wiki
 

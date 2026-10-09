@@ -26,7 +26,7 @@
 
 - (void)applicationWillFinishLaunching:(NSNotification *)notification {
     self.libraryWindowController = [[MCLibraryWindowController alloc] initWithWindowNibName:@"Library"];
-    [self.libraryWindowController loadWindow];
+    [self.libraryWindowController window];
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification {

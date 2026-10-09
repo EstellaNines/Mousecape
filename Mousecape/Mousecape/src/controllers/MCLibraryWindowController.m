@@ -14,10 +14,6 @@
 
 @implementation MCLibraryWindowController
 
-- (void)awakeFromNib {
-    [self composeAccessory];
-}
-
 - (id)initWithWindow:(NSWindow *)window {
     if ((self = [super initWithWindow:window])) {
         
@@ -36,6 +32,15 @@
 }
 
 - (void)composeAccessory {
+    if (@available(macOS 10.10, *)) {
+        NSTitlebarAccessoryViewController *controller = [[NSTitlebarAccessoryViewController alloc] init];
+        controller.view = self.appliedAccessory;
+        controller.layoutAttribute = NSLayoutAttributeRight;
+        [self.window addTitlebarAccessoryViewController:controller];
+        return;
+    }
+
+    // Legacy titlebar layout is retained only for macOS 10.8 and 10.9.
     NSView *themeFrame = [self.window.contentView superview];
     NSView *accessory = self.appliedAccessory;
     [accessory setTranslatesAutoresizingMaskIntoConstraints:NO];

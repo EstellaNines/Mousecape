@@ -1,6 +1,6 @@
 # macOS compatibility development build
 
-Version 1821 has been tested on macOS 26.5 (25F71), Apple Silicon. It fixes the system Arrow and IBeam replacements observed on this machine. This is not a claim that every cursor in every application, or every macOS version, can be replaced.
+Version 1822 has been tested on macOS 26.5 (25F71), Apple Silicon. It fixes the system Arrow and IBeam replacements observed on this machine, and corrects the local build's missing icon and titlebar overlap. This is not a claim that every cursor in every application, or every macOS version, can be replaced.
 
 ## Changes
 
@@ -10,6 +10,7 @@ Version 1821 has been tested on macOS 26.5 (25F71), Apple Silicon. It fixes the 
 - Initialize only known CoreCursor IDs when resetting. On the tested system, gaps 6 and 44 return an error and must not prevent a theme from being applied.
 - Reject invalid frame counts, dimensions, durations, and undecodable image data before registration. Report application/restoration errors and return a failing CLI exit status.
 - Disable the upstream Sparkle update feed so that it cannot replace this fork with upstream 1813.
+- Preserve the app icon metadata in the CLT fallback build, and use AppKit's titlebar accessory controller on macOS 10.10+ to prevent title/window-button overlap.
 
 The additional Tahoe cursor names were identified in the [TahoeSupport fork](https://github.com/AdamWawrzynkowskiGF/Mousecape-TahoeSupport/commit/894c5a3). This fork uses exact names and checks whether each is present on the running system.
 
@@ -65,6 +66,7 @@ Use an absolute path to the animated theme:
 | Native CLI | Built arm64; applied `PRTS Replica v1` successfully |
 | WindowServer readback | All 18 theme entries and the two discovered aliases matched: 20 checks passed |
 | Local GUI | Current source compiled x86_64 with reused resources; ad hoc signature verification passed |
+| Version 1822 appearance | AppIcon2 metadata/resource checked; title and window buttons no longer overlap, applied-theme label remains visible; user confirmed the icon and interface display normally |
 | GUI Apply Cape | Applied the animated theme and displayed the correct applied name |
 | GUI Restore Defaults | Cleared the applied name; ArrowS returned to 28×40 and IBeamS to 23×22, both one frame |
 | Visible behavior | User confirmed that the Arrow replacement and IBeam animation both work after GUI reapplication |
